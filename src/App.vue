@@ -5,10 +5,14 @@ import HelloWorld from './components/HelloWorld.vue'
 <template>
   <div class="wrapper">
     <div class="left">
-      <div> 输入keys，以英文逗号分隔， eg: a,b</div>
+      <div>解析框</div>
+      <a-textarea v-model:value="leftAdvanceValue" rows="6"/>
+      <a-button class="btn" @click="addAdvance" type="primary">解析</a-button>
+      <div> 输入框，以回车为分割，注意每个参数间不能有多个回车</div>
       <div> 支持定义多个层级，以英文句号分隔，eg: a.b</div>
-      <a-textarea v-model:value="leftValue" rows="6" @keydown.enter="add"/>
+      <a-textarea v-model:value="leftValue" rows="6"/>
       <a-button class="btn" @click="add" type="primary">Add</a-button>
+
       <div class="listWrapper" v-if="keysList?.length">
         <div :class="['item', (selected === index) && 'select']" v-for="(i, index) in keysList" @click="select(index)">
           <div class="desc">{{ i }}</div>
@@ -50,6 +54,7 @@ message.config({
 
 const leftValue = ref("")
 const rightValue = ref("")
+const leftAdvanceValue = ref('');
 let store = localStorage.getItem('list');
 const selected = ref(null)
 if (store) {
@@ -87,6 +92,7 @@ const columns = [
 function add() {
   let value = leftValue.value;
   value = value.trim();
+  value = value.replaceAll(/\n/g, ",")
   if (!value) {
     message.error('请输入内容！！！')
   } else {
@@ -97,6 +103,41 @@ function add() {
       selected.value = selected.value + 1
     }
   }
+}
+
+function addAdvance() {
+  let value = leftAdvanceValue.value;
+  value = value.trim();
+  if (!value) {
+    message.error('请输入内容！！！')
+    return;
+  }
+  let listArr = value.split("\n");
+  let retrunArr = [];
+  listArr.map(item => {
+    let str = item?.split('、')[1];
+    console.log('1111')
+    console.log(str)
+    str = str?.split('（')[0]
+    console.log('222')
+    console.log(str)
+    str = str?.trim();
+    str && retrunArr.push(str);
+  })
+  if (retrunArr.length === 0) {
+    message.error('解析失败！！！')
+    return;
+  }
+
+  message.success(`成功解析${retrunArr.length}个参数`)
+  leftValue.value = retrunArr.join('\n')
+  // retrunArr = retrunArr.join(',')
+  // keysList.value = [retrunArr, ...keysList.value]
+  // localStorage.setItem('list', JSON.stringify(toRaw(keysList.value)))
+  // leftAdvanceValue.value = ''
+  // if (selected.value !== null) {
+  //   selected.value = selected.value + 1
+  // }
 }
 
 function deleteItem(index) {
@@ -142,7 +183,8 @@ watch([selected, rightValue], () => {
       message.error('检测到有key值为空，轻检查所选keyList')
       return;
     }
-    let value = get(obj, item);
+    let value = get(obj, item) || get(obj, ['params', item]);
+
     if (!isUndefined(value)) {
       if (isBoolean(value)) {
         returnArr.push({index: i, key: item, value: JSON.stringify(value)})
@@ -207,7 +249,8 @@ watch([selected, rightValue], () => {
   }
 
   .btn {
-    margin-top: 10px
+    margin-top: 10px;
+    margin-bottom: 10px;
   }
 }
 </style>
