@@ -26,7 +26,7 @@ import HelloWorld from './components/HelloWorld.vue'
 <script setup>
 import { ref, toRaw, watch } from 'vue'
 import { message } from 'ant-design-vue';
-import {get} from 'lodash';
+import {get, isUndefined} from 'lodash';
 const leftValue = ref("")
 const rightValue = ref("")
 let store = localStorage.getItem('list');
@@ -110,7 +110,7 @@ watch([selected, rightValue] , () => {
   let returnArr = []
   key.split(',').map(item => {
     let value = get(obj, item);
-    if(value || (value === 0)){
+    if(!isUndefined(value)){
       returnArr.push({key: item, value: value})
     }
   })
