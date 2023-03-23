@@ -8,11 +8,10 @@ import HelloWorld from './components/HelloWorld.vue'
       <div>解析框</div>
       <a-textarea v-model:value="leftAdvanceValue" rows="6"/>
       <a-button class="btn" @click="addAdvance" type="primary">解析</a-button>
-      <div> 输入框，以回车为分割，注意每个参数间不能有多个回车</div>
+      <div> 输入框，以回车或者英文逗号为分割，注意每个参数间不能有多个回车</div>
       <div> 支持定义多个层级，以英文句号分隔，eg: a.b</div>
       <a-textarea v-model:value="leftValue" rows="6"/>
       <a-button class="btn" @click="add" type="primary">Add</a-button>
-
       <div class="listWrapper" v-if="keysList?.length">
         <div :class="['item', (selected === index) && 'select']" v-for="(i, index) in keysList" @click="select(index)">
           <div class="desc">{{ i }}</div>
@@ -44,7 +43,7 @@ import HelloWorld from './components/HelloWorld.vue'
 <script setup>
 import {ref, toRaw, watch} from 'vue'
 import {message} from 'ant-design-vue';
-import {get, isUndefined, isBoolean} from 'lodash';
+import {get, isUndefined, isBoolean, isNull} from 'lodash';
 
 
 message.config({
@@ -131,13 +130,6 @@ function addAdvance() {
 
   message.success(`成功解析${retrunArr.length}个参数`)
   leftValue.value = retrunArr.join('\n')
-  // retrunArr = retrunArr.join(',')
-  // keysList.value = [retrunArr, ...keysList.value]
-  // localStorage.setItem('list', JSON.stringify(toRaw(keysList.value)))
-  // leftAdvanceValue.value = ''
-  // if (selected.value !== null) {
-  //   selected.value = selected.value + 1
-  // }
 }
 
 function deleteItem(index) {
@@ -188,7 +180,9 @@ watch([selected, rightValue], () => {
     if (!isUndefined(value)) {
       if (isBoolean(value)) {
         returnArr.push({index: i, key: item, value: JSON.stringify(value)})
-      } else {
+      } else if(isNull(value)){
+        returnArr.push({index: i, key: item, value: 'null'})
+      }else{
         returnArr.push({index: i, key: item, value: value})
       }
     } else {
