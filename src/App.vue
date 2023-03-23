@@ -5,7 +5,8 @@ import HelloWorld from './components/HelloWorld.vue'
 <template>
   <div class="wrapper">
     <div class="left">
-      <div> 输入keys，以英文逗号分隔</div>
+      <div> 输入keys，以英文逗号分隔， eg: a,b</div>
+      <div> 支持定义多个层级，以英文句号分隔，eg: a.b</div>
       <a-textarea v-model:value="leftValue" rows="6" />
       <a-button class="btn" @click="add" type="primary">Add</a-button>
       <div class="listWrapper" v-if="keysList?.length">
