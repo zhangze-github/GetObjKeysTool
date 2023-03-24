@@ -11,7 +11,7 @@ import HelloWorld from './components/HelloWorld.vue'
       <div> 输入框，以回车或者英文逗号为分割，注意每个参数间不能有多个回车</div>
       <div> 支持定义多个层级，以英文句号分隔，eg: a.b</div>
       <a-textarea v-model:value="leftValue" rows="6"/>
-      <a-button class="btn" @click="add" type="primary">Add</a-button>
+      <a-button class="btn" @click="add" type="primary">ADD</a-button>
       <div class="listWrapper" v-if="keysList?.length">
         <div :class="['item', (selected === index) && 'select']" v-for="(i, index) in keysList" @click="select(index)">
           <div class="desc">{{ i }}</div>
@@ -22,6 +22,9 @@ import HelloWorld from './components/HelloWorld.vue'
     <div class="right">
       <div> 输入JSON</div>
       <a-textarea v-model:value="rightValue" rows="10"/>
+      <div class="action">
+        <a-button @click="autoFill" type="primary">使用剪贴板填入</a-button>
+      </div>
       <a-table :dataSource="tableList" :columns="columns" v-if="tableList.length"
                :pagination="{hideOnSinglePage: true, defaultPageSize: 100}" class="table">
 
@@ -44,7 +47,6 @@ import HelloWorld from './components/HelloWorld.vue'
 import {ref, toRaw, watch} from 'vue'
 import {message} from 'ant-design-vue';
 import {get, isUndefined, isBoolean, isNull} from 'lodash';
-
 
 message.config({
   duration: 1,
@@ -147,6 +149,21 @@ function select(index) {
   selected.value = index;
 }
 
+ async function autoFill(){
+  let text = '';
+  try{
+    text = await navigator.clipboard.readText(); 
+  }catch(e){
+    message.error('获取剪贴板内容失败')
+    return;
+  }
+  if(!text){
+    message.error('获取剪贴板值为空')
+    return;
+  }
+  rightValue.value = text
+}
+
 watch([selected, rightValue], () => {
   let obj = {};
   if (!rightValue.value) {
@@ -172,11 +189,13 @@ watch([selected, rightValue], () => {
   key.split(',').map(item => {
     item = item.trim();
     if (!item) {
-      message.error('检测到有key值为空，轻检查所选keyList')
+      message.error('检测到有key值为空，请检查所选keyList')
       return;
     }
-    let value = get(obj, item) || get(obj, ['params', item]);
-
+    let value = get(obj, item)
+    if(isUndefined(value)){
+      value = get(obj, ['params', item])
+    }
     if (!isUndefined(value)) {
       if (isBoolean(value)) {
         returnArr.push({index: i, key: item, value: JSON.stringify(value)})
@@ -240,6 +259,10 @@ watch([selected, rightValue], () => {
     .table {
       margin-top: 20px;
     }
+
+    .action{
+      margin: 10px 0;
+    }
   }
 
   .btn {
@@ -250,12 +273,6 @@ watch([selected, rightValue], () => {
 </style>
 
 <style>
-/*.ant-message-notice{*/
-/*  display: flex;*/
-/*  align-items: center;*/
-/*  !*padding-left: 50px;*!*/
-/*}*/
-
 .ant-message-notice-content {
   margin-left: -240px !important;
 }
