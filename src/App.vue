@@ -7,7 +7,11 @@ import HelloWorld from './components/HelloWorld.vue'
     <div class="left">
       <div>解析框</div>
       <a-textarea v-model:value="leftAdvanceValue" rows="6"/>
-      <a-button class="btn" @click="addAdvance" type="primary">解析</a-button>
+      <div>
+        <a-button class="btn" @click="addAdvance" type="primary">解析</a-button>
+        <a-button class="btn" @click="addAdvanceForClipboard" type="primary" style="margin-left: 20px">使用剪贴板填入 & 解析</a-button>
+      </div>
+     
       <div> 输入框，以回车或者英文逗号为分割，注意每个参数间不能有多个回车</div>
       <div> 支持定义多个层级，以英文句号分隔，eg: a.b</div>
       <a-textarea v-model:value="leftValue" rows="6"/>
@@ -100,10 +104,27 @@ function add() {
     keysList.value = [value, ...keysList.value]
     localStorage.setItem('list', JSON.stringify(toRaw(keysList.value)))
     leftValue.value = ''
+    leftAdvanceValue.value = ''
     if (selected.value !== null) {
       selected.value = selected.value + 1
     }
   }
+}
+
+async function addAdvanceForClipboard(){
+  let text = '';
+  try{
+    text = await navigator.clipboard.readText(); 
+  }catch(e){
+    message.error('获取剪贴板内容失败')
+    return;
+  }
+  if(!text){
+    message.error('获取剪贴板值为空')
+    return;
+  }
+  leftAdvanceValue.value = text;
+  addAdvance()
 }
 
 function addAdvance() {
@@ -116,14 +137,22 @@ function addAdvance() {
   let listArr = value.split("\n");
   let retrunArr = [];
   listArr.map(item => {
-    let str = item?.split('、')[1];
-    console.log('1111')
-    console.log(str)
-    str = str?.split('（')[0]
-    console.log('222')
-    console.log(str)
-    str = str?.trim();
-    str && retrunArr.push(str);
+    // let str = item?.split('、')[1];
+    // // console.log('1111')
+    // // console.log(str)
+    // str = str?.split('（')[0]
+    // // console.log('222')
+    // // console.log(str)
+    // str = str?.trim();
+   
+    // str && retrunArr.push(str);
+    console.log(item)
+    console.log(item.match(/[a-zA-Z_]+/))
+    let s =  get(item.match(/[a-zA-Z_]+/), '0', '')
+    console.log(s)
+    if(s){
+      retrunArr.push(s);
+    } 
   })
   if (retrunArr.length === 0) {
     message.error('解析失败！！！')
