@@ -20,7 +20,7 @@ import HelloWorld from './components/HelloWorld.vue'
       <a-divider v-if="keysList?.length"/>
       <div class="listWrapper" v-if="keysList?.length">
         <div :class="['item', (selected === index) && 'select']" v-for="(i, index) in keysList" @click="select(index)">
-          <div class="desc">{{ i }}</div>
+          <div class="desc">{{ i }} ({{ i.split(',').length }})</div>
           <a-button @click="(e) => { e.stopPropagation(); deleteItem(index) }" type="text" danger>删除</a-button>
         </div>
       </div>
@@ -53,12 +53,13 @@ import HelloWorld from './components/HelloWorld.vue'
 <script setup>
 import {ref, toRaw, watch} from 'vue'
 import {message} from 'ant-design-vue';
-import {get, isUndefined, isBoolean, isNull, trim} from 'lodash';
+import {get, isUndefined, isBoolean, isNull, trim, toNumber, isNaN} from 'lodash';
 
 message.config({
   duration: 1,
   maxCount: 2,
 });
+
 
 const leftValue = ref("")
 const rightValue = ref("")
@@ -154,7 +155,7 @@ function addAdvance() {
     let s =  get(item.match(/[a-zA-Z_0-9]+/g), '0', '')
     console.log(s)
     if(s){
-      if(s.length === 1){
+      if(!isNaN(toNumber(s))){
         s =  get(item.match(/[a-zA-Z_0-9]+/g), '1', '')
         s && retrunArr.push(s);
       }else{
