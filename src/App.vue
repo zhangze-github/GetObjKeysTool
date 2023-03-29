@@ -5,17 +5,19 @@ import HelloWorld from './components/HelloWorld.vue'
 <template>
   <div class="wrapper">
     <div class="left">
-      <div>解析框</div>
+      <!-- <div>解析框</div> -->
+      <a-typography-title :level="5">Key 解析框</a-typography-title>
       <a-textarea v-model:value="leftAdvanceValue" rows="6"/>
       <div>
         <a-button class="btn" @click="addAdvance" type="primary">解析</a-button>
         <a-button class="btn" @click="addAdvanceForClipboard" type="primary" style="margin-left: 20px">使用剪贴板填入 & 解析</a-button>
       </div>
-     
-      <div> 输入框，以回车或者英文逗号为分割，注意每个参数间不能有多个回车</div>
-      <div> 支持定义多个层级，以英文句号分隔，eg: a.b</div>
+      <a-divider />
+      <a-typography-title :level="5">Key 输入框</a-typography-title>
+      <div> 以回车或者英文逗号为分割，注意每个参数间不能有多个回车</div>
       <a-textarea v-model:value="leftValue" rows="6"/>
-      <a-button class="btn" @click="add" type="primary">ADD</a-button>
+      <a-button class="btn" @click="add" type="primary">添加到列表</a-button>
+      <a-divider v-if="keysList?.length"/>
       <div class="listWrapper" v-if="keysList?.length">
         <div :class="['item', (selected === index) && 'select']" v-for="(i, index) in keysList" @click="select(index)">
           <div class="desc">{{ i }}</div>
@@ -24,17 +26,18 @@ import HelloWorld from './components/HelloWorld.vue'
       </div>
     </div>
     <div class="right">
-      <div> 输入JSON</div>
+      <!-- <div> 输入JSON</div> -->
+      <a-typography-title :level="5">JSON 输入框</a-typography-title>
       <a-textarea v-model:value="rightValue" rows="10"/>
       <div class="action">
         <a-button @click="autoFill" type="primary">使用剪贴板填入</a-button>
       </div>
+      <a-divider  v-if="tableList.length"/>
       <a-table :dataSource="tableList" :columns="columns" v-if="tableList.length"
                :pagination="{hideOnSinglePage: true, defaultPageSize: 100}" class="table">
-
         <template #bodyCell="{ column, record }">
           <template v-if="column.key === 'value'">
-            <span v-if="record.value === '参数未上报'" style="color: #f40">
+            <span v-if="record.value === '参数未上报'" style="color: #ff4d4f">
               {{ record.value }}
             </span>
             <span v-else>
@@ -50,7 +53,7 @@ import HelloWorld from './components/HelloWorld.vue'
 <script setup>
 import {ref, toRaw, watch} from 'vue'
 import {message} from 'ant-design-vue';
-import {get, isUndefined, isBoolean, isNull} from 'lodash';
+import {get, isUndefined, isBoolean, isNull, trim} from 'lodash';
 
 message.config({
   duration: 1,
@@ -200,13 +203,8 @@ function select(index) {
 
 watch([selected, rightValue], () => {
   let obj = {};
-  if (!rightValue.value) {
-    message.error('请输入右侧 JSON')
-    tableList.value = []
-    return;
-  }
   try {
-    obj = JSON.parse(rightValue.value);
+    obj = JSON.parse( trim(rightValue.value) || "{}" );
   } catch (e) {
     message.error('JSON 解析失败')
     tableList.value = []
@@ -252,14 +250,17 @@ watch([selected, rightValue], () => {
   min-height: 100vh;
   display: flex;
   justify-content: space-around;
+  max-width: 1200px;
+  margin: 0 auto;
 
   // align-items: center;
   .left {
     margin-top: 20px;
-    width: 40%;
+    width: 42%;
 
     .listWrapper {
       width: 100%;
+
 
       .item {
         display: flex;
@@ -267,26 +268,30 @@ watch([selected, rightValue], () => {
         justify-content: space-between;
         margin-top: 10px;
         border: 1px solid #ccc;
-        border-radius: 4px;
+        border-radius: 10px;
         padding: 10px;
 
         &:hover {
-          background-color: #eee;
+          box-shadow: #64646f33 0px 7px 29px 0px;
         }
 
         .desc {
           word-break: break-all;
+          cursor: pointer;
         }
       }
 
       .select {
-        border-color: rgb(90, 90, 199);
+        border-color: #3277de;
+        box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
       }
+
+
     }
   }
 
   .right {
-    width: 50%;
+    width: 52%;
     // padding: 20px;
     margin-top: 20px;
 
@@ -295,19 +300,23 @@ watch([selected, rightValue], () => {
     }
 
     .action{
-      margin: 10px 0;
+      margin-top: 10px;
     }
   }
 
   .btn {
     margin-top: 10px;
-    margin-bottom: 10px;
+    margin-bottom: 0px;
   }
 }
 </style>
 
 <style>
 .ant-message-notice-content {
-  margin-left: -240px !important;
+  margin-left: -260px !important;
+}
+
+.ant-divider-horizontal{
+  margin: 14px 0 !important;
 }
 </style>
