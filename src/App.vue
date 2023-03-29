@@ -147,11 +147,16 @@ function addAdvance() {
    
     // str && retrunArr.push(str);
     console.log(item)
-    console.log(item.match(/[a-zA-Z_]+/))
-    let s =  get(item.match(/[a-zA-Z_]+/), '0', '')
+    console.log(item.match(/[a-zA-Z_0-9]+/g))
+    let s =  get(item.match(/[a-zA-Z_0-9]+/g), '0', '')
     console.log(s)
     if(s){
-      retrunArr.push(s);
+      if(s.length === 1){
+        s =  get(item.match(/[a-zA-Z_0-9]+/g), '1', '')
+        s && retrunArr.push(s);
+      }else{
+        retrunArr.push(s);
+      }
     } 
   })
   if (retrunArr.length === 0) {
