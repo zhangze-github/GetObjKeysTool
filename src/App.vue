@@ -20,7 +20,7 @@ import HelloWorld from './components/HelloWorld.vue'
       <a-divider v-if="keysList?.length"/>
       <div class="listWrapper" v-if="keysList?.length">
         <div :class="['item', (selected === index) && 'select']" v-for="(i, index) in keysList" @click="select(index)">
-          <div class="desc">{{ i }} ({{ i.split(',').length }})</div>
+          <div class="desc">{{ i }}</div>
           <a-button @click="(e) => { e.stopPropagation(); deleteItem(index) }" type="text" danger>删除</a-button>
         </div>
       </div>
