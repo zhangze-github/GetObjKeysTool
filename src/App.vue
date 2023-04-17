@@ -11,6 +11,7 @@ import HelloWorld from './components/HelloWorld.vue'
       <div>
         <a-button class="btn" @click="addAdvance" type="primary">解析</a-button>
         <a-button class="btn" @click="addAdvanceForClipboard" type="primary" style="margin-left: 20px">使用剪贴板填入 & 解析</a-button>
+        <a-button class="btn" @click="addAdvanceForClipboardUniq" type="primary" style="margin-left: 20px">使用剪贴板填入 & 解析 & 去重</a-button>
       </div>
       <a-divider />
       <a-typography-title :level="5">Key 输入框</a-typography-title>
@@ -53,7 +54,7 @@ import HelloWorld from './components/HelloWorld.vue'
 <script setup>
 import {ref, toRaw, watch} from 'vue'
 import {message} from 'ant-design-vue';
-import {get, isUndefined, isBoolean, isNull, trim, toNumber, isNaN} from 'lodash';
+import {get, isUndefined, isBoolean, isNull, trim, toNumber, isNaN, uniq} from 'lodash';
 
 message.config({
   duration: 1,
@@ -131,7 +132,24 @@ async function addAdvanceForClipboard(){
   addAdvance()
 }
 
-function addAdvance() {
+async function addAdvanceForClipboardUniq(){
+  let text = '';
+  try{
+    text = await navigator.clipboard.readText(); 
+  }catch(e){
+    message.error('获取剪贴板内容失败')
+    return;
+  }
+  if(!text){
+    message.error('获取剪贴板值为空')
+    return;
+  }
+  leftAdvanceValue.value = text;
+  addAdvance(true)
+}
+
+
+function addAdvance(flag) {
   let value = leftAdvanceValue.value;
   value = value.trim();
   if (!value) {
@@ -167,7 +185,9 @@ function addAdvance() {
     message.error('解析失败！！！')
     return;
   }
-
+  if(flag){
+    retrunArr = uniq(retrunArr)
+  }
   message.success(`成功解析${retrunArr.length}个参数`)
   leftValue.value = retrunArr.join('\n')
 }
