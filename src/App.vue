@@ -282,12 +282,19 @@ watch([selected, rightValue], () => {
     .listWrapper {
       width: 100%;
 
+      max-height: 400px;
+      overflow-y: scroll;
+      padding: 10px;
+      box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
+      border-radius: 4px;
+
 
       .item {
         display: flex;
         align-items: center;
         justify-content: space-between;
-        margin-top: 10px;
+        margin-top: 5px;
+        margin-bottom: 5px;
         border: 1px solid #ccc;
         border-radius: 10px;
         padding: 10px;

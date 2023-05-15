@@ -6,3 +6,7 @@
 #app{
   min-height: 100vh;
 }
+
+body{
+  background-color: #f8f8f8!important;
+}
