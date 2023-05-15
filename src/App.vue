@@ -282,7 +282,7 @@ watch([selected, rightValue], () => {
     .listWrapper {
       width: 100%;
 
-      max-height: 600px;
+      max-height: 650px;
       overflow-y: scroll;
       padding: 10px;
       box-shadow: rgba(100, 100, 111, 0.2) 0px 7px 29px 0px;
