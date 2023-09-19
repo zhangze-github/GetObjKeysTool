@@ -35,8 +35,10 @@ import HelloWorld from './components/HelloWorld.vue'
       </div>
       <a-divider  v-if="tableList.length"/>
       <a-table :dataSource="tableList" :columns="columns" v-if="tableList.length"
-               :pagination="{hideOnSinglePage: true, defaultPageSize: 100}" class="table">
-        <template #bodyCell="{ column, record }">
+               :pagination="{hideOnSinglePage: true, defaultPageSize: 100}" class="table"
+               :row-key="() => generateRandomString()"
+               >
+        <template #bodyCell="{ column, record }" :key="generateRandomString()">
           <template v-if="column.key === 'value'">
             <span v-if="record.value === '参数未上报'" style="color: #ff4d4f">
               {{ record.value }}
@@ -54,7 +56,7 @@ import HelloWorld from './components/HelloWorld.vue'
 <script setup>
 import {ref, toRaw, watch} from 'vue'
 import {message} from 'ant-design-vue';
-import {get, isUndefined, isBoolean, isNull, trim, toNumber, isNaN, uniq} from 'lodash';
+import {get, isUndefined, isBoolean, isNull, trim, toNumber, isNaN, uniq, rando} from 'lodash';
 
 message.config({
   duration: 1,
@@ -264,6 +266,19 @@ watch([selected, rightValue], () => {
   })
   tableList.value = returnArr;
 })
+
+function generateRandomString() {
+  let lenth = 20;
+  const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+  let randomString = '';
+
+  for (let i = 0; i < length; i++) {
+    const randomIndex = Math.floor(Math.random() * characters.length);
+    randomString += characters.charAt(randomIndex);
+  }
+
+  return randomString;
+}
 
 </script>
 <style scoped lang="less">
