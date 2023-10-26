@@ -44,7 +44,10 @@ import HelloWorld from './components/HelloWorld.vue'
               {{ record.value }}
             </span>
             <span v-else>
-              {{ record.value }}
+              <span :class="isNumber(record.value) && 'number-element'">
+                {{ record.value }}
+              </span>
+            
             </span>
           </template>
         </template>
@@ -56,7 +59,7 @@ import HelloWorld from './components/HelloWorld.vue'
 <script setup>
 import {ref, toRaw, watch} from 'vue'
 import {message} from 'ant-design-vue';
-import {get, isUndefined, isBoolean, isNull, trim, toNumber, isNaN, uniq, rando} from 'lodash';
+import {get, isUndefined, isBoolean, isNull, trim, toNumber, isNaN, uniq, rando, isNumber} from 'lodash';
 
 message.config({
   duration: 1,
@@ -337,9 +340,14 @@ function generateRandomString() {
     width: 52%;
     // padding: 20px;
     margin-top: 20px;
-
     .table {
       margin-top: 20px;
+      margin-bottom: 100px;
+      .number-element{
+        background-color: #dfbefd;
+        padding: 6px;
+        border-radius: 4px;
+      }
     }
 
     .action{
